@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#17454b" />
+        <title>VLS · Nhận diện ngôn ngữ ký hiệu</title>
+        <link rel="stylesheet" href="style.css?v=cosine-distance-top5-2" />
+        <link rel="stylesheet" href="demo-layout.css?v=cosine-distance-top5-2" />
+        <script defer src="app.js?v=cosine-distance-top5-2"></script>
+    </head>
+    <body>
+        <svg
+            class="sprite"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+        >
+            <symbol id="hand" viewBox="0 0 24 24">
+                <path
+                    d="M8 13V5a1.5 1.5 0 0 1 3 0v6-8a1.5 1.5 0 0 1 3 0v8-6a1.5 1.5 0 0 1 3 0v7-4a1.5 1.5 0 0 1 3 0v7c0 4-2 7-6 7h-1c-2 0-4-1-5-3l-4-5a1.5 1.5 0 0 1 2-2l2 2"
+                />
+            </symbol>
+            <symbol id="film" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <path d="M7 4v16M17 4v16M3 9h4m-4 6h4m10-6h4m-4 6h4" />
+            </symbol>
+            <symbol id="camera" viewBox="0 0 24 24">
+                <rect x="3" y="6" width="13" height="12" rx="2" />
+                <path d="m16 10 5-3v10l-5-3" />
+            </symbol>
+            <symbol id="upload" viewBox="0 0 24 24">
+                <path d="M12 16V4m-5 5 5-5 5 5M4 16v4h16v-4" />
+            </symbol>
+            <symbol id="scan" viewBox="0 0 24 24">
+                <path d="M9 4H4v5m11-5h5v5m0 6v5h-5m-6 0H4v-5m3-3h10" />
+            </symbol>
+            <symbol id="history" viewBox="0 0 24 24">
+                <path d="M4 10a8 8 0 1 1 1 8M4 5v5h5m3-3v5l3 2" />
+            </symbol>
+            <symbol id="arrow" viewBox="0 0 24 24">
+                <path d="M4 12h15m-6-6 6 6-6 6" />
+            </symbol>
+            <symbol id="copy" viewBox="0 0 24 24">
+                <rect x="8" y="8" width="12" height="12" rx="2" />
+                <path d="M16 8V4H4v12h4" />
+            </symbol>
+            <symbol id="trash" viewBox="0 0 24 24">
+                <path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7" />
+            </symbol>
+        </svg>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="./"
+                    ><span class="brand-icon"
+                        ><svg><use href="#hand" /></svg></span
+                    ><span
+                        ><strong>VSL</strong
+                        ><small>NGÔN NGỮ KÝ HIỆU VIỆT NAM</small></span
+                    ></a
+                >
+                <nav>
+                    <a href="#workspace" class="nav-current">Nhận diện</a
+                    ><a href="#history">Lịch sử</a>
+                </nav>
+                <span class="mode" id="mode"
+                    ><i></i><span>Chế độ minh họa</span></span
+                >
+            </div>
+        </header>
+        <main class="shell">
+            <div class="breadcrumb">
+                <span></span><span>PHIÊN NHẬN DIỆN <b>✦</b></span>
+            </div>
+            <div class="layout" id="workspace">
+                <aside class="panel input">
+                    <div class="section-tag">
+                        01 <span></span> NGUỒN ĐẦU VÀO
+                    </div>
+                    <h2>Chọn nguồn</h2>
+                    <p class="muted intro">
+                        Tải video có sẵn hoặc thực hiện ký hiệu trước camera.
+                    </p>
+                    <div class="switch" aria-label="Nguồn đầu vào">
+                        <button id="video-tab" aria-pressed="true">
+                            <svg><use href="#film" /></svg> Tải video
+                        </button>
+                        <button id="camera-tab" aria-pressed="false">
+                            <svg><use href="#camera" /></svg> Camera
+                        </button>
+                        <button id="add-sign-tab" aria-pressed="false">
+                            <svg><use href="#hand" /></svg> Thêm ký hiệu
+                        </button>
+                    </div>
+                    <div id="video-controls">
+                        <input
+                            type="file"
+                            id="file"
+                            accept="video/*,.mp4,.webm,.mov"
+                            hidden
+                        />
+                        <button class="drop" id="drop">
+                            <span class="round"
+                                ><svg><use href="#upload" /></svg></span
+                            ><strong id="file-name"
+                                >Chọn hoặc kéo thả video</strong
+                            ><small>MP4, WebM, MOV · tối đa 100 MB</small>
+                        </button>
+                    </div>
+                    <div id="camera-controls" hidden>
+                        <button class="drop" id="camera-toggle">
+                            <span class="round"
+                                ><svg><use href="#camera" /></svg></span
+                            ><strong id="camera-label">Bật camera</strong
+                            ><small>Cho phép trình duyệt truy cập camera</small>
+                        </button>
+                    </div>
+                    <div id="add-sign-controls" hidden>
+                        <label class="field-label" for="add-sign-name"
+                            >Tên ký hiệu mới</label
+                        >
+                        <input
+                            class="text-field"
+                            id="add-sign-name"
+                            type="text"
+                            maxlength="80"
+                            autocomplete="off"
+                            placeholder="Ví dụ: Xin chào"
+                        />
+                        <button class="drop" id="add-sign-toggle">
+                            <span class="round"
+                                ><svg><use href="#camera" /></svg></span
+                            ><strong id="add-sign-label">Bật camera</strong
+                            ><small
+                                >Nhập tên, bắt đầu quay rồi kết thúc để lưu
+                                mẫu</small
+                            >
+                        </button>
+                    </div>
+                    <button class="primary" id="run" disabled>
+                        <svg><use href="#scan" /></svg
+                        ><span>Bắt đầu nhận diện</span
+                        ><svg class="trailing"><use href="#arrow" /></svg>
+                    </button>
+
+                    <p id="status" role="status" class="status">
+                        Đang chờ video.
+                    </p>
+                    <div class="tip">
+                        <span>✧</span>
+                        <div>
+                            <strong>Khung hình rõ hơn</strong>
+                            <p>
+                                Giữ hai tay trong khung hình, hướng về camera và
+                                chọn nơi đủ sáng.
+                            </p>
+                        </div>
+                    </div>
+                </aside>
+
+                <section class="panel studio" aria-label="Phiên nhận diện">
+                    <div class="hero">
+                        <div class="hero-inner">
+                            <div class="hero-tag"><span></span></div>
+                            <h1>Nhận diện<br />ngôn ngữ ký hiệu</h1>
+                            <p>
+                                Chuyển động của đôi tay, kết quả dưới dạng văn
+                                bản.
+                            </p>
+                        </div>
+                        <span class="hero-mark">✦</span>
+                    </div>
+                    <div class="workbench">
+                        <section class="preview-column">
+                            <div class="section-tag">
+                                02 <span></span> XEM TRƯỚC
+                            </div>
+                            <div class="viewer" id="viewer">
+                                <video id="preview" playsinline hidden></video>
+                                <div class="placeholder" id="placeholder">
+                                    <svg><use href="#film" /></svg
+                                    ><strong>Chưa có video</strong
+                                    ><small
+                                        >Chọn nguồn để hiển thị tại đây</small
+                                    >
+                                </div>
+                                <i class="corner c1"></i
+                                ><i class="corner c2"></i
+                                ><i class="corner c3"></i
+                                ><i class="corner c4"></i>
+                            </div>
+                        </section>
+                        <section class="result" aria-live="polite">
+                            <div class="section-tag">
+                                03 <span></span> KẾT QUẢ
+                            </div>
+                            <h2>Ký hiệu nhận diện</h2>
+                            <div class="result-box">
+                                <span class="result-state" id="result-state"
+                                    >CHƯA CÓ KẾT QUẢ</span
+                                ><strong id="prediction">—</strong>
+                                <p id="score">
+                                    Kết quả sẽ xuất hiện sau khi nhận diện.
+                                </p>
+                                <div id="top5-heading" class="top5-heading" hidden>
+                                    TOP 5 KẾT QUẢ · KHOẢNG CÁCH COSINE
+                                </div>
+                                <ol id="top5" class="top5-results" hidden></ol>
+                            </div>
+                            <button id="copy" class="minor" disabled>
+                                <svg><use href="#copy" /></svg> Sao chép kết quả
+                            </button>
+                        </section>
+                    </div>
+                </section>
+            </div>
+            <section class="panel log" id="history">
+                <div class="log-head">
+                    <div>
+                        <div class="section-tag">
+                            04 <span></span> PHIÊN ĐÃ LƯU
+                        </div>
+                        <h2>
+                            <svg><use href="#history" /></svg> Lịch sử nhận diện
+                            <span class="count" id="count">0</span>
+                        </h2>
+                    </div>
+                    <button id="clear" class="minor" disabled>
+                        <svg><use href="#trash" /></svg> Xóa lịch sử
+                    </button>
+                </div>
+                <p class="empty" id="empty">
+                    Chưa có lượt nhận diện. Kết quả sẽ được lưu trong trình
+                    duyệt này.
+                </p>
+                <ul id="entries"></ul>
+            </section>
+            <footer>
+                <span>VSL <b>✦</b></span
+                ><span>Nhận diện ngôn ngữ ký hiệu từ video</span>
+            </footer>
+        </main>
+    </body>
+</html>

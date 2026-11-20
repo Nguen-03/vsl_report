@@ -1,0 +1,19 @@
+.input h2 {
+    font-family: Arial, sans-serif;
+}
+
+.hero {
+    background-size: auto 80%;
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+.viewer {
+    height: 320px;
+}
+
+@media (max-width: 650px) {
+    .viewer {
+        height: 260px;
+    }
+}
